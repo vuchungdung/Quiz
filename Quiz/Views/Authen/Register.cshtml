@@ -1,0 +1,55 @@
+﻿@model Quiz.ViewModel.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="register-box-body">
+    <p class="login-box-msg">Đăng ký thành viên mới</p>
+
+    @using (Html.BeginForm("Register", "Authen", FormMethod.Post))
+    {
+        <div class="form-group has-feedback">
+            @Html.TextBoxFor(model => model.fullname, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập họ tên" })
+            <span class="glyphicon glyphicon-user form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            @Html.TextBoxFor(model => model.username, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập tài khoản" })
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            @Html.TextBoxFor(model => model.email, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập Email" })
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            @Html.PasswordFor(model => model.password, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập mật khẩu" })
+            <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="Gender">Giới tính:</label><br />
+                    @Html.EnumDropDownListFor(e => e.gender, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="type">Loại tài khoản:</label><br />
+                    @Html.EnumDropDownListFor(e => e.type, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <!-- /.col -->
+            <div class="col-xs-4">
+                <button type="submit" class="btn btn-primary btn-block btn-flat">Đăng ký</button>
+            </div>
+            <!-- /.col -->
+        </div>
+    }
+    <a href="/Authen/Login" class="text-center">Bạn đã có tài khoản ?</a>
+</div>
+

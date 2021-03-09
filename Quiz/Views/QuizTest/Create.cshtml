@@ -1,0 +1,61 @@
+﻿@model Quiz.ViewModel.QuizTestViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="box box-warning">
+    <div class="box-header with-border">
+        <h3 class="box-title">Thêm đề thi</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        @using (Html.BeginForm("Create", "QuizTest", FormMethod.Post))
+        {
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" });
+
+            <div class="form-group">
+                <label>Tiêu đề đề thi</label>
+                @Html.TextBoxFor(model => model.name, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập tiêu đề đề thi" })
+                @Html.ValidationMessageFor(model => model.name, "", new { @class = "text-danger" })
+
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="Quiz">Thời gian :</label><br />
+                        @Html.EnumDropDownListFor(m => m.TotalTime, htmlAttributes: new { @class = "form-control"})
+                        @Html.ValidationMessageFor(model => model.TotalTime, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="Quiz">Môn học:</label><br />
+                        @Html.DropDownListFor(m => m.SubjectID, Model.Subject, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.SubjectID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="Quiz">Trạng thái:</label><br />
+                        @Html.EnumDropDownListFor(m => m.status, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.status, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="Quiz">Tổng điểm:</label><br />
+                        @Html.TextBoxFor(m => m.TotalMark, htmlAttributes: new { @class = "form-control", @type = "number" })
+                        @Html.ValidationMessageFor(model => model.TotalMark, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-primary">Thêm mới</button>
+                <a href="/Quiz/Index" class="btn btn-default">Quay lại</a>
+            </div>
+        }
+    </div>
+</div>
+

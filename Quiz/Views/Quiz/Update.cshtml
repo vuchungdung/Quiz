@@ -1,0 +1,87 @@
+﻿@model Quiz.ViewModel.QuizViewModel
+@{
+    ViewBag.Title = "Update";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="box box-warning">
+    <div class="box-header with-border">
+        <h3 class="box-title">Thêm câu hỏi</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        @using (Html.BeginForm("Update", "Quiz", FormMethod.Post))
+        {
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" });
+            @Html.TextBoxFor(model => model.Id, htmlAttributes: new { @style = "display:none" })
+            <div class="form-group">
+                <label>Tiêu đề câu hỏi</label>
+                @Html.TextBoxFor(model => model.Name, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập tiêu đề câu hỏi" })
+            </div>
+            <div class="form-group">
+                <label>Nội dung câu hỏi</label>
+                @Html.TextBoxFor(model => model.content, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập mội dung câu hỏi" })
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Đáp án A</label>
+                            @Html.TextBoxFor(model => model.answerA, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập đáp án A" })
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Đáp án B</label>
+                            @Html.TextBoxFor(model => model.answerB, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập đáp án B" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Đáp án C</label>
+                            @Html.TextBoxFor(model => model.answerC, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập đáp án C" })
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Đáp án D</label>
+                            @Html.TextBoxFor(model => model.answerD, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập đáp án D" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="Quiz">Đáp án đúng:</label><br />
+                            @Html.EnumDropDownListFor(m => m.trueAnswer, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.trueAnswer, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="Quiz">Môn học:</label><br />
+                            @Html.DropDownListFor(m => m.SubjectID, Model.Subjects, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.SubjectID, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="Quiz">Độ khó:</label><br />
+                            @Html.EnumDropDownListFor(m => m.HardType, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.HardType, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-primary">Cập nhật</button>
+                <a href="/Quiz/Index" class="btn btn-default">Quay lại</a>
+            </div>
+        }
+    </div>
+</div>
+
