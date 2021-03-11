@@ -153,6 +153,10 @@
     <Compile Include="Migrations\202103041851181_version_1.0.1.designer.cs">
       <DependentUpon>202103041851181_version_1.0.1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202103100354255_editDb.cs" />
+    <Compile Include="Migrations\202103100354255_editDb.Designer.cs">
+      <DependentUpon>202103100354255_editDb.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActiveTest.cs" />
     <Compile Include="Models\CommonEnum\ModelEnum.cs" />
@@ -165,10 +169,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\ChangepassViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="ViewModel\QuizSearchViewModel.cs" />
     <Compile Include="ViewModel\QuizTestViewModel.cs" />
     <Compile Include="ViewModel\QuizViewModel.cs" />
     <Compile Include="ViewModel\RegisterViewModel.cs" />
     <Compile Include="ViewModel\SubjectViewModel.cs" />
+    <Compile Include="ViewModel\UserViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\bootstrap-notify-master\bootstrap-notify-master\.gitignore" />
@@ -6413,6 +6419,10 @@
     <Content Include="Assets\documentation\index.html" />
     <Content Include="Assets\documentation\style.css" />
     <Content Include="Assets\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Assets\multi-select\css\picklist.css" />
+    <Content Include="Assets\multi-select\css\picklist.min.css" />
+    <Content Include="Assets\multi-select\js\picklist.js" />
+    <Content Include="Assets\multi-select\js\picklist.min.js" />
     <Content Include="Assets\plugins\bootstrap-slider\bootstrap-slider.js" />
     <Content Include="Assets\plugins\bootstrap-slider\slider.css" />
     <Content Include="Assets\plugins\bootstrap-wysihtml5\bootstrap3-wysihtml5.all.js" />
@@ -6568,6 +6578,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\axios.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Assets\bootstrap-notify-master\bootstrap-notify-master\bower.json" />
@@ -7189,11 +7200,13 @@
     <Content Include="Assets\plugins\input-mask\phone-codes\phone-be.json" />
     <Content Include="Assets\plugins\input-mask\phone-codes\phone-codes.json" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.1.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -7226,10 +7239,11 @@
     <Content Include="Views\Quiz\Update.cshtml" />
     <Content Include="Views\QuizTest\Index.cshtml" />
     <Content Include="Views\QuizTest\Create.cshtml" />
+    <Content Include="Views\Quiz\MyIndex.cshtml" />
+    <Content Include="Views\User\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\User\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -7256,6 +7270,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202103041851181_version_1.0.1.resx">
       <DependentUpon>202103041851181_version_1.0.1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202103100354255_editDb.resx">
+      <DependentUpon>202103100354255_editDb.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

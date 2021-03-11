@@ -33,18 +33,11 @@ namespace Quiz.Models
                 .HasMany(i => i.QuizTests)
                 .WithOptional()
                 .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<User>()
-                .HasIndex(e => e.username)
-                .IsUnique();
-
+                
             modelBuilder.Entity<User>()
                 .Property(e => e.username)
                 .IsUnicode(false);
 
-            modelBuilder.Entity<User>()
-                .HasIndex(e => e.email)
-                .IsUnique();
             modelBuilder.Conventions.Remove<ManyToManyCascadeDeleteConvention>();
             modelBuilder.Entity<ActiveTest>()
                 .HasMany(c => c.QuizResults)

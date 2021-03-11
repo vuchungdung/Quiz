@@ -16,7 +16,7 @@ namespace Quiz.Controllers
 
         QuizContext _db = new QuizContext();
 
-        [Authorize(Roles = "admin,teacher")]
+        [Authorize(Roles = "admin")]
         public ActionResult Index(string keyword, int page = 1, int pageSize = 7)
         {
             IPagedList<QuizViewModel> quizs = null;
@@ -160,6 +160,36 @@ namespace Quiz.Controllers
             {
                 throw ex;
             }
+        }
+        [Authorize(Roles = "admin,teacher")]
+        public ActionResult MyIndex(string keyword, int page = 1, int pageSize = 7)
+        {
+            var userID = _db.Users.Where(t => t.username == User.Identity.Name).First().ID;
+            IPagedList<QuizViewModel> quizs = null;
+
+            var list = _db.Quizzes.Where(x=>x.CreatorID == userID).ToList();
+
+            if (!String.IsNullOrEmpty(keyword))
+            {
+                list = list.Where(x => x.name.ToUpper().Contains(keyword.ToUpper())).ToList();
+            }
+
+            quizs = list.Select(x => new QuizViewModel()
+            {
+                Id = x.QuizID,
+                Name = x.name,
+                content = x.content,
+                SubjectName = x.Subject.name,
+                HardType = x.HardType,
+                trueAnswer = x.trueAnswer
+
+            }).OrderByDescending(x => x.Id).ToPagedList(page, pageSize);
+
+            ViewBag.SearchString = keyword;
+
+            ViewBag.Count = list.Count(); ;
+
+            return View(quizs);
         }
     }
 }

@@ -61,7 +61,7 @@ namespace Quiz.Controllers
                     var user = db.Users.Where(e => e.username.Equals(model.Username)).First();
                     if (user != null)
                     {
-                        if (user.password == Helper.CalculateMD5Hash(model.Password) && (user.status == UserStatus.Activated || user.status == UserStatus.NotActivated))
+                        if (user.password == Helper.CalculateMD5Hash(model.Password) && user.status == UserStatus.Activated)
                         {
                             setCookie(user.username, model.RememberMe, user.role);
                             Session["UserID"] = user.ID;
@@ -70,15 +70,13 @@ namespace Quiz.Controllers
                                 return Redirect(ReturnUrl);
                             return RedirectToAction("Index", "Home");
                         }
-                        ViewBag.Error = "Sai tài khoản hoặc mật khẩu!";
+                        ModelState.AddModelError("","Sai tài khoản hoặc mật khẩu!");
                         return View();
 
                     }
                 }
 
             }
-
-            ViewBag.Error = "Sai tài khoản hoặc mật khẩu!";
             return View();
         }
         public ActionResult Register()
@@ -99,13 +97,13 @@ namespace Quiz.Controllers
                 var exist = db.Users.Any(e => e.username == model.username);
                 if (exist)
                 {
-                    ViewBag.Error = "Tên người dùng " + model.username + " đã tồn tại";
+                    ModelState.AddModelError("","Tên người dùng " + model.username + " đã tồn tại");
                     return View();
                 }
                 exist = db.Users.Any(e => e.email == model.email);
                 if (exist)
                 {
-                    ViewBag.Error = "Email " + model.email + " đã tồn tại";
+                    ModelState.AddModelError("", "Email " + model.email + " đã tồn tại");
                     return View();
                 }
                 User u = new User
@@ -140,7 +138,7 @@ namespace Quiz.Controllers
             {
                 if (model.oldpassword == model.password)
                 {
-                    ViewBag.anno = "Mật khẩu mới không được trùng mật khẩu cũ !";
+                    ModelState.AddModelError("", "Mật khẩu mới không được trùng mật khẩu cũ !");
                     return View();
                 }
                 else

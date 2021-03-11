@@ -43,7 +43,7 @@ namespace Quiz.ViewModel
 
         public HardType HardTypeChoose { get; set; }
 
-        [LimitCount(1, 50, ErrorMessage = "Số câu hỏi từ 10 tới 50")]
-        public List<QuizViewModel> quizID { get; set; }
+        [LimitCount(1, 50, ErrorMessage = "Số câu hỏi từ 1 tới 50")]
+        public List<int> quizID { get; set; }
     }
 }

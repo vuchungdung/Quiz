@@ -8,8 +8,9 @@
 <div class="login-box-body">
     <p class="login-box-msg">Đăng nhập hệ thống</p>
 
-    @using (Html.BeginForm("Login","Authen",FormMethod.Post))
+    @using (Html.BeginForm("Login", "Authen", FormMethod.Post))
     {
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" });
         <div class="form-group has-feedback">
             @Html.TextBoxFor(model => model.Username, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập tài khoản" })
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>

@@ -1,61 +1,261 @@
 ﻿@model Quiz.ViewModel.QuizTestViewModel
 
-@{
-    ViewBag.Title = "Create";
-    Layout = "~/Views/Shared/_LoginLayout.cshtml";
-}
+@{ ViewBag.Title = "Tạo đề thi mới";
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<style>
+    select[multiple], select[size] {
+        height: 324.5px;
+    }
+
+    textarea:focus, input:focus, button, select {
+        outline: none;
+    }
+</style>
 
 <div class="box box-warning">
     <div class="box-header with-border">
         <h3 class="box-title">Thêm đề thi</h3>
     </div>
-    <!-- /.box-header -->
     <div class="box-body">
-        @using (Html.BeginForm("Create", "QuizTest", FormMethod.Post))
-        {
-            @Html.ValidationSummary(false, "", new { @class = "text-danger" });
-
+        <form method="post" id="createTest">
             <div class="form-group">
-                <label>Tiêu đề đề thi</label>
-                @Html.TextBoxFor(model => model.name, htmlAttributes: new { @class = "form-control", @placeholder = "Nhập tiêu đề đề thi" })
+                <label for="Quiz">Tiêu đề bài thi:</label><br />
+                @Html.TextBoxFor(m => m.name, new { @class = "form-control", @placeholder = "Tiêu đề" })
                 @Html.ValidationMessageFor(model => model.name, "", new { @class = "text-danger" })
-
             </div>
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="Quiz">Thời gian :</label><br />
-                        @Html.EnumDropDownListFor(m => m.TotalTime, htmlAttributes: new { @class = "form-control"})
+                        @Html.EnumDropDownListFor(m => m.TotalTime, new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.TotalTime, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="Quiz">Môn học:</label><br />
-                        @Html.DropDownListFor(m => m.SubjectID, Model.Subject, htmlAttributes: new { @class = "form-control" })
+                        @Html.DropDownListFor(m => m.SubjectID, Model.Subject, new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.SubjectID, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="Quiz">Trạng thái:</label><br />
-                        @Html.EnumDropDownListFor(m => m.status, htmlAttributes: new { @class = "form-control" })
+                        @Html.EnumDropDownListFor(m => m.status, new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.status, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="Quiz">Tổng điểm:</label><br />
-                        @Html.TextBoxFor(m => m.TotalMark, htmlAttributes: new { @class = "form-control", @type = "number" })
+                        @Html.TextBoxFor(m => m.TotalMark, new { @class = "form-control", @type = "number" })
                         @Html.ValidationMessageFor(model => model.TotalMark, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
-            <div class="box-footer">
-                <button type="submit" class="btn btn-primary">Thêm mới</button>
-                <a href="/Quiz/Index" class="btn btn-default">Quay lại</a>
+            <div class="form-group">
+                <label for="Quiz">Chọn câu hỏi </label>
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="Quiz">Tìm theo tên :</label>
+                        <input class="form-control" name="name_search" id="name_search" type="text" placeholder="Tìm kiếm câu hỏi">
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="Quiz">Độ khó:</label><br />
+                            @Html.EnumDropDownListFor(m => m.HardTypeChoose, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <p class="pull-right" id="countSelected">Đã chọn 0 câu</p>
+                    </div>
+                </div>
+                <div id="list"></div>
             </div>
-        }
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Thêm đề</button>
+                <a href="/QuizTest/Index" class="btn btn-danger">Quay lại</a>
+            </div>
+        </form>
     </div>
 </div>
 
+<style>
+    option {
+        font-size: 16px;
+    }
+</style>
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script type="text/javascript">
+
+    var pick;
+    var data =
+    {
+        available: [
+
+        ],
+        selected: [
+        ]
+    };
+    var loadData = function () {
+        var subject = $('#SubjectID').val();
+        var sname = $('#name_search').val();
+        var hardtype = $('#HardTypeChoose').val();
+        $.ajax({
+            type: "POST",
+            url: '/QuizTest/SearchQuiz',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ subject: subject, name: sname, hard: hardtype }),
+            dataType: "json",
+            success: function (recData) {
+                var newavailable = [];
+                recData.QuizList.forEach((e) => {
+                    newavailable.push({ id: e.id, label: e.Name, hard: hardtype });
+                });
+                pick.pickList('updateData', newavailable);
+            },
+            error: function () {
+                var notify = $.notify('<strong>Lỗi</strong><br/>Lỗi hệ thống<br />', {
+                    type: 'pastel-warning',
+                    allow_dismiss: false,
+                });
+            }
+        });
+    };
+    var initialData = function () {
+        var subject = $('#SubjectID').val();
+        var sname = $('#name_search').val();
+        var hardtype = $('#HardTypeChoose').val();
+        $.ajax({
+            type: "POST",
+            url: '/QuizTest/SearchQuiz',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ subject: subject, name: sname, hard: hardtype }),
+            dataType: "json",
+            success: function (recData) {
+                recData.QuizList.forEach((e) => {
+                    data.available.push({ id: e.id, label: e.Name, hard: hardtype });
+                });
+                pick = $('#list').pickList({
+                    data: data,
+                    buttons: [
+                        {
+                            action: 'add',
+                            label: 'Thêm',
+                            className: 'btn btn-block btn-info'
+                        },
+                        {
+                            action: 'remove',
+                            label: 'Bỏ',
+                            className: 'btn btn-block btn-warning text-light'
+                        },
+                        {
+                            action: 'removeAll',
+                            label: 'Bỏ tất cả',
+                            className: 'btn btn-block btn-danger text-light'
+                        }
+                    ]
+                });
+
+                $('#button').on('click', function () {
+                    console.log(pick.pickList('getSelected'));
+                    updateSelectedCount();
+                });
+
+                pick.on('picklist.remove', function (event, v) {
+                    updateSelectedCount();
+                });
+
+                pick.on('picklist.add', function (event, v) {
+                    updateSelectedCount();
+                });
+                pick.on('picklist.removeAll', function (event, v) {
+                    updateSelectedCount();
+                });
+            },
+            error: function () {
+                var notify = $.notify('<strong>Lỗi</strong><br/>Lỗi hệ thống<br />', {
+                    type: 'pastel-warning',
+                    allow_dismiss: false,
+                });
+            }
+        });
+    };
+    //tìm kiếm câu hỏi
+    $(function () {
+        initialData();
+    })
+
+    $('#SubjectID').change(function () {
+        loadData();
+    });
+
+    $('#name_search').keyup(() => loadData());
+    $('#HardTypeChoose').change(() => loadData());
+
+    $('#createTest').on('submit', function (e) {
+        $.fn.serializeFormJSON = function () {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function () {
+                if (o[this.name]) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+        e.preventDefault();
+        var tempdata = $(this).serializeFormJSON();
+        var quizID = pick.pickList('getSelectedID').quizID;
+        var data = { ...tempdata, quizID };
+        console.log(data);
+        $.ajax({
+            type: "POST",
+            url: '/QuizTest/Create',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ model: data }),
+            dataType: "json",
+            success: function (recData) {
+                $('#overlay').fadeOut();
+                if (recData.success === true) {
+                    var notify = $.notify('<strong>Thành công</strong><br/>' + recData.Message + '<br />', {
+                        type: 'success',
+                        allow_dismiss: true,
+                        timer: 100,
+                    });
+                    setTimeout(function () {
+                        window.location.href = '/QuizTest/MyQuizTest';
+                    }, 2000);
+                }
+                else {
+                    var notify = $.notify('<strong>Thất bại</strong><br/>' + recData.Message + '<br />', {
+                        type: 'warning',
+                        allow_dismiss: true,
+                        timer: 100,
+                    });
+                }
+
+
+            },
+            error: function (xhr, status, error) {
+                var notify = $.notify('<strong>Lỗi</strong><br/>Có lỗi xảy ra<br />', {
+                    type: 'warning',
+                    allow_dismiss: true,
+                });
+            }
+        });
+
+    });
+</script>
+<script>
+    function updateSelectedCount() {
+        $('#countSelected').text("Đã chọn " + pick.pickList('getSelected').length + " câu.")
+    }
+</script>
