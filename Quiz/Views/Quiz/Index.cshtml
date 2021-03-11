@@ -24,7 +24,7 @@
                 <div class="box-header">
                     <h3 class="box-title">Bảng danh sách câu hỏi</h3>
                 </div>
-                <a href="/Subject/Create" style="margin-left:10px" class="btn btn-sm btn-success">Thêm mới</a>
+                <a href="/Quiz/Create" style="margin-left:10px" class="btn btn-sm btn-success">Thêm mới</a>
                 <div class="box-body">
                     <h5 class="text-danger">Có tổng số: @ViewBag.Count câu hỏi khác nhau.</h5>
                     <table id="example1" class="table table-bordered table-striped">
@@ -60,7 +60,7 @@
                                         </td>
                                         <td style="width:10%">
                                             <a href="/Quiz/Update?id=@item.Id" class="btn btn-sm btn-primary">Sửa</a>
-                                            <a onclick="deleteItem(@item.Id)" class="btn btn-sm btn-danger">Xóa</a>
+                                            <a onclick="deleteConfirm(@item.Id)" data-toggle="modal" data-target="#myModal" class="btn btn-sm btn-danger">Xóa</a>
                                         </td>
                                     </tr>
                                 }
@@ -89,17 +89,41 @@
         </div>
     </div>
 </section>
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Bạn đang yêu cầu xóa dữ liệu</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                Bạn có thật sự muốn xóa dữ liệu này ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="deleteBtn" class="btn btn-danger" data-dismiss="modal">Xóa</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script>
-    function deleteItem(id) {
+    var idx;
+    var deleteConfirm = function (id) {
+        idx = id;
+    }
+    $('#deleteBtn').click(function () {
         $.ajax({
-            url: "/Quiz/Delete?id=" + id,
+            url: "/Quiz/Delete?id=" + idx,
             type: "post",
             dataType: "json",
             data: {},
             success: function (result) {
                 var notify = $.notify('<strong>Xóa thành công</strong><br/>' + result + '<br />', {
                     type: 'success',
-                    allow_dismiss: false,
+                    allow_dismiss: true,
                     timer: 1000,
                 });
                 setTimeout(function () {
@@ -109,10 +133,10 @@
             error: function () {
                 var notify = $.notify('<strong>Lỗi</strong><br/>Không xóa được<br />', {
                     type: 'warning',
-                    allow_dismiss: false,
+                    allow_dismiss: true,
+                    timer: 1000,
                 });
             }
         })
-    }
+    })
 </script>
-

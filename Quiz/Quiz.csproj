@@ -137,6 +137,7 @@
     <Compile Include="Common\EnumExtension.cs" />
     <Compile Include="Common\Helper.cs" />
     <Compile Include="Controllers\AuthenController.cs" />
+    <Compile Include="Controllers\DoQuizController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
     <Compile Include="Controllers\QuizTestController.cs" />
@@ -168,12 +169,14 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\ChangepassViewModel.cs" />
+    <Compile Include="ViewModel\DoTestViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
     <Compile Include="ViewModel\QuizSearchViewModel.cs" />
     <Compile Include="ViewModel\QuizTestViewModel.cs" />
     <Compile Include="ViewModel\QuizViewModel.cs" />
     <Compile Include="ViewModel\RegisterViewModel.cs" />
     <Compile Include="ViewModel\SubjectViewModel.cs" />
+    <Compile Include="ViewModel\SubmitExamViewModel.cs" />
     <Compile Include="ViewModel\UserViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -7241,9 +7244,12 @@
     <Content Include="Views\QuizTest\Create.cshtml" />
     <Content Include="Views\Quiz\MyIndex.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
+    <Content Include="Views\QuizTest\Update.cshtml" />
+    <Content Include="Views\QuizTest\MyIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\DoQuiz\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

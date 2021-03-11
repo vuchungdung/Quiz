@@ -1,6 +1,6 @@
 ﻿@model Quiz.ViewModel.QuizTestViewModel
 
-@{ ViewBag.Title = "Tạo đề thi mới";
+@{ ViewBag.Title = "Sửa thi mới";
     Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <style>
@@ -15,10 +15,11 @@
 
 <div class="box box-warning">
     <div class="box-header with-border">
-        <h3 class="box-title">Thêm đề thi</h3>
+        <h3 class="box-title">Sửa đề thi</h3>
     </div>
     <div class="box-body">
         <form method="post" id="createTest">
+            @Html.TextBoxFor(m => m.TestID, htmlAttributes: new { @style = "display:none" })
             <div class="form-group">
                 <label for="Quiz">Tiêu đề bài thi:</label><br />
                 @Html.TextBoxFor(m => m.name, new { @class = "form-control", @placeholder = "Tiêu đề" })
@@ -35,7 +36,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label for="Quiz">Môn học:</label><br />
-                        @Html.DropDownListFor(m => m.SubjectID, Model.Subject, new { @class = "form-control" })
+                        @Html.DropDownListFor(m => m.SubjectID, Model.Subject, new { @class = "form-control", @disabled = "true" })
                         @Html.ValidationMessageFor(model => model.SubjectID, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -75,7 +76,7 @@
             </div>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-success">Thêm đề</button>
+                <button type="submit" class="btn btn-success">Sửa đề</button>
                 <a href="/QuizTest/Index" class="btn btn-danger">Quay lại</a>
             </div>
         </form>
@@ -125,18 +126,16 @@
         });
     };
     var initialData = function () {
-        var subject = $('#SubjectID').val();
-        var sname = $('#name_search').val();
-        var hardtype = $('#HardTypeChoose').val();
+        var TestID = @ViewBag.id;
         $.ajax({
             type: "POST",
-            url: '/QuizTest/SearchQuiz',
+            url: '/QuizTest/GetQuizFromTest',
             contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({ subject: subject, name: sname, hard: hardtype }),
+            data: JSON.stringify({ testid: TestID }),
             dataType: "json",
             success: function (recData) {
-                recData.QuizList.forEach((e) => {
-                    data.available.push({ id: e.id, label: e.Name, hard: hardtype });
+                recData.forEach((e) => {
+                    data.selected.push({ id: e.Id, label: e.Name, hard: e.HardType });
                 });
                 pick = $('#list').pickList({
                     data: data,
@@ -144,22 +143,22 @@
                         {
                             action: 'add',
                             label: 'Thêm',
-                            className: 'btn btn-block btn-info'
+                            className: 'btn btn-sm btn-block btn-info'
                         },
                         {
                             action: 'remove',
                             label: 'Bỏ',
-                            className: 'btn btn-block btn-warning text-light'
+                            className: 'btn btn-sm btn-block btn-warning text-light'
                         },
                         {
                             action: 'removeAll',
                             label: 'Bỏ tất cả',
-                            className: 'btn btn-block btn-danger text-light'
+                            className: 'btn btn-sm btn-block btn-danger text-light'
                         }
                     ]
                 });
-
-                $('#button').on('click', function () {
+                updateSelectedCount();
+                 $('#button').on('click', function () {
                     console.log(pick.pickList('getSelected'));
                     updateSelectedCount();
                 });
@@ -183,14 +182,9 @@
             }
         });
     };
-    //tìm kiếm câu hỏi
     $(function () {
         initialData();
     })
-
-    $('#SubjectID').change(function () {
-        loadData();
-    });
 
     $('#name_search').keyup(() => loadData());
     $('#HardTypeChoose').change(() => loadData());
@@ -212,13 +206,13 @@
             return o;
         };
         e.preventDefault();
-        var tempdata = $(this).serializeFormJSON();
+        var tempdata =$(this).serializeFormJSON();
         var quizID = pick.pickList('getSelectedID').quizID;
-        var data = { ...tempdata, quizID };
+        var data = { ...tempdata, quizID};
         console.log(data);
         $.ajax({
             type: "POST",
-            url: '/QuizTest/Create',
+            url: '/QuizTest/Update',
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({ model: data }),
             dataType: "json",
@@ -251,8 +245,6 @@
 
     });
 </script>
-<script>
-    function updateSelectedCount() {
+<script>function updateSelectedCount() {
         $('#countSelected').text("Đã chọn " + pick.pickList('getSelected').length + " câu.")
-    }
-</script>
+    }</script>

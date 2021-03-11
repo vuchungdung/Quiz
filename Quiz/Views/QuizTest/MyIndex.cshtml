@@ -1,0 +1,226 @@
+﻿@model PagedList.IPagedList<Quiz.ViewModel.QuizTestViewModel>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "MyIndex";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Đề thi
+        <small>Danh sách</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+        <li><a href="#">Đề thi</a></li>
+        <li class="active">Danh sách đề thi</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Bảng danh sách đề thi</h3>
+                </div>
+                <a href="/QuizTest/Create" style="margin-left:10px" class="btn btn-sm btn-success">Thêm mới</a>
+                <div class="box-body">
+                    <h5 class="text-danger">Có tổng số: @ViewBag.Count đề thi khác nhau.</h5>
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th>Môn học</th>
+                                <th>Thời gian</th>
+                                <th>Tổng điểm</th>
+                                <th>Trạng thái</th>
+                                <th>Phát hành</th>
+                                <th style="width:10%">Nghiệp vụ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @item.name
+                                        </td>
+                                        <td>
+                                            @item.SubjectName
+                                        </td>
+                                        <td>
+                                            @item.TotalTime.GetDisplayName()
+                                        </td>
+                                        <td>
+                                            @item.TotalMark
+                                        </td>
+                                        <td>
+                                            @item.status.GetDisplayName()
+                                        </td>
+                                        <td>
+                                            <button type="button" data-toggle="modal" data-target="#roomModal" class="btn btn-sm btn-warning">Tạo phòng</button>
+                                        </td>
+                                        <td style="width:11%">
+                                            <a href="/QuizTest/Update?id=@item.TestID" class="btn btn-sm btn-primary">Sửa</a>
+                                            <a onclick="deleteConfirm(@item.TestID)" data-toggle="modal" data-target="#myModal" class="btn btn-sm btn-danger">Xóa</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th>Môn học</th>
+                                <th>Thời gian</th>
+                                <th>Tổng điểm</th>
+                                <th>Trạng thái</th>
+                                <th>Phát hành</th>
+                                <th style="width:11%">Nghiệp vụ</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    @{ if (Model.PageCount > 1)
+                        {
+                            <nav aria-label="Page navigation example" style="text-align:center">
+                                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, @keyWord = @ViewBag.SearchString }))
+                            </nav>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Bạn đang yêu cầu xóa dữ liệu</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                Bạn có thật sự muốn xóa dữ liệu này ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="deleteBtn" class="btn btn-danger" data-dismiss="modal">Xóa</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<div class="modal fade" id="roomModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tạo phòng thi mới</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="testname"></p>
+                <div class="form-group">
+                    <label for="Time">Bắt đầu lúc:</label><br />
+                    <input class="form-control dateselect" type="datetime-local" id="fromTime" />
+                </div>
+                <div class="form-group">
+                    <label for="Time">Kết thúc lúc:</label><br />
+                    <input class="form-control dateselect" type="datetime-local" id="toTime" />
+                </div>
+                <div class="form-group">
+                    <label for="Time">Mã phòng thi (tạo ngẫu nhiên):</label><br />
+                    <input class="form-control" type="text" id="roomCode" placeholder="roomCode" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="confirmCreateRoom()" class="btn btn-info">Tạo</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+    var idx;
+    var deleteConfirm = function (id) {
+        idx = id;
+    }
+    $('#deleteBtn').click(function () {
+        $.ajax({
+            url: "/QuizTest/Delete?id=" + idx,
+            type: "post",
+            dataType: "json",
+            data: {},
+            success: function (result) {
+                var notify = $.notify('<strong>Xóa thành công</strong><br/>' + result + '<br />', {
+                    type: 'success',
+                    allow_dismiss: true,
+                    timer: 1000,
+                });
+                setTimeout(function () {
+                    window.location.reload();
+                }, 500);
+            },
+            error: function () {
+                var notify = $.notify('<strong>Lỗi</strong><br/>Không xóa được<br />', {
+                    type: 'warning',
+                    allow_dismiss: true,
+                    timer: 1000,
+                });
+            }
+        })
+    })
+</script>
+<script>
+    function createRoom(QtestID, testName) {
+        testID = QtestID;
+        let modal = $('#roomModal');
+        modal.find('#testname').text(testName);
+        modal.find('#roomCode').val(RandomCode(7));
+        modal.modal('show');
+    }
+    function RandomCode(length) {
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+    function confirmCreateRoom() {
+        let roomCode = $('#roomCode').val();
+        let fromTime = $('#fromTime').val();
+        let toTime = $('#toTime').val();
+        if (roomCode && fromTime && toTime) {
+            if (roomCode.length > 20 || roomCode.length < 4) {
+                swal('Lỗi', 'Mã phòng thi phải từ 4 đến 20 ký tự', 'warning');
+            }
+            else if (new Date() > new Date(toTime)) {
+                swal('Lỗi', 'Ngày kết thúc phải lớn hơn hiện tại', 'warning');
+            }
+            else if (new Date(fromTime) >= new Date(toTime)) {
+                swal('Lỗi', 'Ngày kết thúc phải lớn hơn ngày bắt đầu', 'warning');
+            }
+            else {
+                axios.post('/DoQuiz/CreateActiveTest', { QuizTestID: testID, Code: roomCode, FromTime: fromTime, ToTime: toTime }).then(resp => {
+                    if (resp.data.Success) {
+                        swal('Thành công', resp.data.Message, 'success');
+                        $('#roomModal').modal('hide');
+                    }
+                    else {
+                        swal('Lỗi', resp.data.Message, 'error');
+                    }
+                });
+            }
+        }
+        else {
+            swal('Lỗi', 'Vui lòng nhập đủ thông tin trước', 'warning');
+        }
+    }
+</script>

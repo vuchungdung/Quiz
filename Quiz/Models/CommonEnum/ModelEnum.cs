@@ -93,13 +93,6 @@ namespace Quiz.Models
         [Display(Name = "Hiển thị")]
         Active = 1,
     }
-    public enum TestStatusAd
-    {
-        [Display(Name = "Hiển thị")]
-        Active = 1,
-        [Display(Name = "Ẩn")]
-        NotActive = 2,
-    }
     public enum HardType
     {
         [Display(Name = "Dễ")]

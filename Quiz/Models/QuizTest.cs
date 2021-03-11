@@ -38,7 +38,7 @@ namespace Quiz.Models
         public virtual Subject Subject { get; set; }
 
         [Required]
-        public TestStatusAd status { get; set; }
+        public TestStatus status { get; set; }
 
         public virtual ICollection<Quizs> Quiz { get; set; }
         [Required]

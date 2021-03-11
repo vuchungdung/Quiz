@@ -1,4 +1,5 @@
-﻿using Quiz.Common;
+﻿using PagedList;
+using Quiz.Common;
 using Quiz.Models;
 using Quiz.ViewModel;
 using System;
@@ -15,9 +16,61 @@ namespace Quiz.Controllers
         QuizContext _db = new QuizContext();
 
         [Authorize(Roles = "admin")]
-        public ActionResult Index()
+        public ActionResult Index(string keyword, int page = 1, int pageSize = 7)
         {
-            return View();
+            IPagedList<QuizTestViewModel> quiztests = null;
+            var list = _db.QuizTests.ToList();
+
+            if (!String.IsNullOrEmpty(keyword))
+            {
+                list = list.Where(x => x.name.ToUpper().Contains(keyword.ToUpper())).ToList();
+            }
+
+            quiztests = list.Select(x => new QuizTestViewModel()
+            {
+                TestID = x.TestID,
+                name = x.name,
+                SubjectName = x.Subject.name,
+                TotalTime = (TimeQuiz)x.TotalTime,
+                TotalMark = x.TotalMark,
+                status = (TestStatus)x.status
+
+            }).OrderByDescending(x => x.TestID).ToPagedList(page, pageSize);
+
+            ViewBag.SearchString = keyword;
+
+            ViewBag.Count = list.Count(); ;
+
+            return View(quiztests);
+        }
+        [Authorize(Roles = "admin,teacher")]
+        public ActionResult MyIndex(string keyword, int page = 1, int pageSize = 7)
+        {
+            var userID = _db.Users.Where(t => t.username == User.Identity.Name).First().ID;
+            IPagedList<QuizTestViewModel> quiztests = null;
+            var list = _db.QuizTests.Where(x=>x.CreatorID == userID).ToList();
+
+            if (!String.IsNullOrEmpty(keyword))
+            {
+                list = list.Where(x => x.name.ToUpper().Contains(keyword.ToUpper())).ToList();
+            }
+
+            quiztests = list.Select(x => new QuizTestViewModel()
+            {
+                TestID = x.TestID,
+                name = x.name,
+                SubjectName = x.Subject.name,
+                TotalTime = (TimeQuiz)x.TotalTime,
+                TotalMark = x.TotalMark,
+                status = (TestStatus)x.status
+
+            }).OrderByDescending(x => x.TestID).ToPagedList(page, pageSize);
+
+            ViewBag.SearchString = keyword;
+
+            ViewBag.Count = list.Count(); ;
+
+            return View(quiztests);
         }
         [Authorize(Roles = "admin,teacher")]
         public ActionResult Create()
@@ -28,10 +81,76 @@ namespace Quiz.Controllers
             };
             return View(viewModel);
         }
+        [HttpPost]
         [Authorize(Roles = "admin,teacher")]
-        public ActionResult Update()
+        public JsonResult Create(QuizTestViewModel model)
         {
-            return View();
+            model.Subject = Common.Helper.getSubjectItem();
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, Message = "Bạn nhập thiếu các trường yêu cầu" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                User u = _db.Users.Where(i => i.username == User.Identity.Name).First();
+
+                QuizTest test = new QuizTest
+                {
+                    CreatorID = u.ID,
+                    Creator = u,
+                    CreateDate = DateTime.Now,
+                    SubjectID = model.SubjectID,
+                    TotalMark = model.TotalMark,
+                    name = model.name,
+                    TotalTime = (int)model.TotalTime,
+                    status = (TestStatus)model.status,
+                };
+                foreach (var item in model.quizID)
+                {
+                    Quizs q = _db.Quizzes.Find(item);
+                    test.Quiz.Add(q);
+                }
+                _db.QuizTests.Add(test);
+                _db.SaveChanges();
+                return Json(new { success = true, Message = "Tạo đề thi thành công !" }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+        [Authorize(Roles = "admin,teacher")]
+        [HttpGet]
+        public ActionResult Update(int id)
+        {
+            var CurrentID = Session["UserID"];
+            try
+            {
+                var exist = _db.QuizTests.Any(e => e.TestID == id);
+                if (!exist)
+                {
+                    return RedirectToAction("MyQuizTest");
+                }
+                QuizTest test = _db.QuizTests.Find(id);
+
+                if ((test.CreatorID != (int)CurrentID && User.IsInRole("teacher")))
+                {
+                    return RedirectToAction("MyQuizTest");
+                }
+                QuizTestViewModel quiz = new QuizTestViewModel
+                {
+                    name = test.name,
+                    Subject = Common.Helper.getSubjectItem(),
+                    SubjectID = test.SubjectID,
+                    status = (TestStatus)test.status,
+                    TestID = test.TestID,
+                    TotalMark = test.TotalMark,
+                    TotalTime = (TimeQuiz)test.TotalTime,
+                };
+                ViewBag.id = test.TestID;
+                return View(quiz);
+            }
+            catch
+            {
+                return RedirectToAction("MyQuizTest");
+            }
         }
         public JsonResult SearchQuiz(int subject, string name = null, HardType? hard = null)
         {
@@ -89,10 +208,22 @@ namespace Quiz.Controllers
                 return Json(new { Message = "Lỗi hệ thống" }, JsonRequestBehavior.AllowGet);
             }
         }
+        public JsonResult GetQuizFromTest(int testid)
+        {
+            QuizTest test = _db.QuizTests.Find(testid);
+            List<QuizViewModel> quizzes = test.Quiz.Select(
+                c => new QuizViewModel
+                {
+                    Id = c.QuizID,
+                    HardType = c.HardType,
+                    Name = c.name,
 
-        [HttpPost]
+                }).ToList();
+            return Json(quizzes);
+        }
         [Authorize(Roles = "admin,teacher")]
-        public JsonResult Create(QuizTestViewModel model)
+        [HttpPost]
+        public ActionResult Update(QuizTestViewModel model)
         {
             model.Subject = Common.Helper.getSubjectItem();
             if (!ModelState.IsValid)
@@ -103,27 +234,45 @@ namespace Quiz.Controllers
             {
                 User u = _db.Users.Where(i => i.username == User.Identity.Name).First();
 
-                QuizTest test = new QuizTest
+                QuizTest test = _db.QuizTests.Find(model.TestID);
+                test.CreatorID = u.ID;
+                test.Creator = u;
+                test.CreateDate = DateTime.Now;
+                test.TotalMark = model.TotalMark;
+                test.name = model.name;
+                test.TotalTime = (int)model.TotalTime;
+                test.status = (TestStatus)model.status;
+                foreach (var item in test.Quiz.ToList())
                 {
-                    CreatorID = u.ID,
-                    Creator = u,
-                    CreateDate = DateTime.Now,
-                    SubjectID = model.SubjectID,
-                    TotalMark = model.TotalMark,
-                    name = model.name,
-                    TotalTime = (int)model.TotalTime,
-                    status = (TestStatusAd)model.status,
-                };
-                foreach (var item in model.quizID)
+                    test.Quiz.Remove(item);                   
+                }
+                foreach(var quiz in model.quizID)
                 {
-                    Quizs q = _db.Quizzes.Find(item);
+                    var q = _db.Quizzes.Find(quiz);
                     test.Quiz.Add(q);
                 }
-                _db.QuizTests.Add(test);
                 _db.SaveChanges();
-                return Json(new { success = true, Message = "Tạo đề thi thành công !" }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true, Message = "Cập đề thi thành công !" }, JsonRequestBehavior.AllowGet);
             }
-
+        }
+        [Authorize(Roles = "admin,teacher")]
+        public JsonResult Delete(int id)
+        {
+            try
+            {
+                var model = _db.QuizTests.Find(id);
+                foreach(var item in model.Quiz.ToList())
+                {
+                    model.Quiz.Remove(item);
+                }
+                _db.QuizTests.Remove(model);
+                _db.SaveChanges();
+                return Json(model.name, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

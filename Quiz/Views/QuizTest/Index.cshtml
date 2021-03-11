@@ -1,8 +1,120 @@
-﻿
+﻿@model PagedList.IPagedList<Quiz.ViewModel.QuizTestViewModel>
+@using PagedList.Mvc;
+
 @{
     ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<section class="content-header">
+    <h1>
+        Đề thi
+        <small>Danh sách</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Trang chủ</a></li>
+        <li><a href="#">Đề thi</a></li>
+        <li class="active">Danh sách đề thi</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Bảng danh sách đề thi</h3>
+                </div>
+                <a href="/QuizTest/Create" style="margin-left:10px" class="btn btn-sm btn-success">Thêm mới</a>
+                <div class="box-body">
+                    <h5 class="text-danger">Có tổng số: @ViewBag.Count đề thi khác nhau.</h5>
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th>Môn học</th>
+                                <th>Thời gian</th>
+                                <th>Tổng điểm</th>
+                                <th>Trạng thái</th>
+                                <th style="width:10%">Nghiệp vụ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @item.name
+                                        </td>
+                                        <td>
+                                            @item.SubjectName
+                                        </td>
+                                        <td>
+                                            @item.TotalTime.GetDisplayName()
+                                        </td>
+                                        <td>
+                                            @item.TotalMark
+                                        </td>
+                                        <td>
+                                            @item.status.GetDisplayName()
+                                        </td>
+                                        <td style="width:11%">
+                                            <a href="/QuizTest/Update?id=@item.TestID" class="btn btn-sm btn-primary">Sửa</a>
+                                            <a onclick="deleteItem(@item.TestID)" class="btn btn-sm btn-danger">Xóa</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th>Môn học</th>
+                                <th>Thời gian</th>
+                                <th>Tổng điểm</th>
+                                <th>Trạng thái</th>
+                                <th style="width:11%">Nghiệp vụ</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    @{ if (Model.PageCount > 1)
+                        {
+                            <nav aria-label="Page navigation example" style="text-align:center">
+                                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, @keyWord = @ViewBag.SearchString }))
+                            </nav>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    function deleteItem(id) {
+        $.ajax({
+            url: "/QuizTest/Delete?id=" + id,
+            type: "post",
+            dataType: "json",
+            data: {},
+            success: function (result) {
+                var notify = $.notify('<strong>Xóa thành công</strong><br/>' + result + '<br />', {
+                    type: 'success',
+                    allow_dismiss: true,
+                    timer: 1000,
+                });
+                setTimeout(function () {
+                    window.location.reload();
+                }, 500);
+            },
+            error: function () {
+                var notify = $.notify('<strong>Lỗi</strong><br/>Không xóa được<br />', {
+                    type: 'warning',
+                    allow_dismiss: true,
+                    timer: 1000,
+
+                });
+            }
+        })
+    }
+</script>
 
