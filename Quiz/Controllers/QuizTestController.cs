@@ -274,5 +274,31 @@ namespace Quiz.Controllers
                 throw ex;
             }
         }
+        [Authorize(Roles = "student")]
+        public ActionResult IndexStudent(string keyWord, int page = 1, int pageSize = 7,int subjectId = 0)
+        {
+            IPagedList<QuizTestViewModel> quiztests = null;
+            var list = _db.QuizTests.Where(x=>x.status == TestStatus.Active && x.SubjectID == subjectId).ToList();
+
+            if (!String.IsNullOrEmpty(keyWord))
+            {
+                list = list.Where(x => x.name.ToUpper().Contains(keyWord.ToUpper())).ToList();
+            }
+
+            quiztests = list.Select(x => new QuizTestViewModel()
+            {
+                TestID = x.TestID,
+                name = x.name,
+                TotalTime = (TimeQuiz)x.TotalTime,
+                TotalMark = x.TotalMark,
+
+            }).OrderByDescending(x => x.TestID).ToPagedList(page, pageSize);
+
+            ViewBag.keyword = keyWord;
+            ViewBag.subjectId = subjectId;
+            ViewBag.Count = list.Count(); ;
+
+            return View(quiztests);
+        }
     }
 }

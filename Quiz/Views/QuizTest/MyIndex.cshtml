@@ -60,7 +60,7 @@
                                             @item.status.GetDisplayName()
                                         </td>
                                         <td>
-                                            <button type="button" data-toggle="modal" data-target="#roomModal" class="btn btn-sm btn-warning">Tạo phòng</button>
+                                            <button onclick="runCode(@item.TestID)" type="button" data-toggle="modal" data-target="#roomModal" class="btn btn-sm btn-warning">Tạo phòng</button>
                                         </td>
                                         <td style="width:11%">
                                             <a href="/QuizTest/Update?id=@item.TestID" class="btn btn-sm btn-primary">Sửa</a>
@@ -177,12 +177,10 @@
     })
 </script>
 <script>
-    function createRoom(QtestID, testName) {
-        testID = QtestID;
-        let modal = $('#roomModal');
-        modal.find('#testname').text(testName);
-        modal.find('#roomCode').val(RandomCode(7));
-        modal.modal('show');
+    var testID = 0;
+    function runCode(testid) {
+        $('#roomCode').val(RandomCode(12));
+        testID = testid;
     }
     function RandomCode(length) {
         var result = '';
@@ -192,7 +190,7 @@
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;
-    }
+    }    
     function confirmCreateRoom() {
         let roomCode = $('#roomCode').val();
         let fromTime = $('#fromTime').val();
@@ -211,7 +209,8 @@
                 axios.post('/DoQuiz/CreateActiveTest', { QuizTestID: testID, Code: roomCode, FromTime: fromTime, ToTime: toTime }).then(resp => {
                     if (resp.data.Success) {
                         swal('Thành công', resp.data.Message, 'success');
-                        $('#roomModal').modal('hide');
+                        $('#fromTime').val("");
+                        $('#toTime').val("");
                     }
                     else {
                         swal('Lỗi', resp.data.Message, 'error');

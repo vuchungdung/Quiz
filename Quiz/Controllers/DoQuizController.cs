@@ -1,4 +1,5 @@
-﻿using Quiz.Models;
+﻿using PagedList;
+using Quiz.Models;
 using Quiz.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,13 @@ namespace Quiz.Controllers
         }
 
         [Authorize(Roles = "teacher,admin")]
-        public ViewResult MyActiveTest()
+        public ViewResult MyActiveTest(int page = 1, int pageSize = 7)
         {
             int UserID = (int)Session["UserID"];
-            List<ActiveTest> activeTests = db.ActiveTests.Where(a => a.CreatorID == UserID).ToList();
+            IPagedList<ActiveTest> activeTests = null;
+            var list = db.ActiveTests.Where(a => a.CreatorID == UserID && a.IsActive == true).ToList().OrderByDescending(x => x.ID).ToPagedList(page, pageSize);
+            activeTests = list;
+            ViewBag.Count = list.Count();
             return View(activeTests);
         }
 

@@ -6572,6 +6572,11 @@
     <Content Include="Assets\plugins\timepicker\bootstrap-timepicker.js" />
     <Content Include="Assets\plugins\timepicker\bootstrap-timepicker.min.css" />
     <Content Include="Assets\plugins\timepicker\bootstrap-timepicker.min.js" />
+    <Content Include="Assets\sweetalert\bootstrap-sweetalert.png" />
+    <Content Include="Assets\sweetalert\docs.css" />
+    <Content Include="Assets\sweetalert\sweet-alert.css" />
+    <Content Include="Assets\sweetalert\sweetalert.min.js" />
+    <Content Include="Assets\sweetalert\thumbs-up.jpg" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -7202,6 +7207,9 @@
     <Content Include="Assets\fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="Assets\plugins\input-mask\phone-codes\phone-be.json" />
     <Content Include="Assets\plugins\input-mask\phone-codes\phone-codes.json" />
+    <Content Include="Assets\sweetalert\sweet-alert-animations.less" />
+    <Content Include="Assets\sweetalert\sweet-alert-combine.less" />
+    <Content Include="Assets\sweetalert\sweet-alert.less" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.1.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -7246,10 +7254,12 @@
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\QuizTest\Update.cshtml" />
     <Content Include="Views\QuizTest\MyIndex.cshtml" />
+    <Content Include="Views\Subject\IndexStudent.cshtml" />
+    <Content Include="Views\QuizTest\IndexStudent.cshtml" />
+    <Content Include="Views\DoQuiz\MyActiveTest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\DoQuiz\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

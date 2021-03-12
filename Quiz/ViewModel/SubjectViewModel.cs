@@ -12,5 +12,7 @@ namespace Quiz.ViewModel
 
         [Required(ErrorMessage ="Vui lòng nhập đầy đủ tên môn học!")]
         public string Name { get; set; }
+
+        public int Count { get; set; }
     }
 }

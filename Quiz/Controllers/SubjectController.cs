@@ -114,5 +114,28 @@ namespace Quiz.Controllers
                 throw ex;
             }
         }
+        [Authorize(Roles ="student")]
+        public ActionResult IndexStudent(string keyWord, int page = 1, int pageSize = 7)
+        {
+            IPagedList<SubjectViewModel> subjects = null;
+            var list = _db.Subjects.Select(m => new SubjectViewModel()
+            {
+                Id = m.ID,
+                Name = m.name,
+                Count = m.QuizTests.Where(x => x.status == TestStatus.Active).Count()
+            }).ToList();
+
+            if (!String.IsNullOrEmpty(keyWord))
+            {
+                list = list.Where(x => x.Name.ToUpper().Contains(keyWord.ToUpper())).ToList();
+            }
+            
+            subjects = list.OrderByDescending(x => x.Id).ToPagedList(page, pageSize);                        
+
+            ViewBag.keyWord = keyWord;
+            ViewBag.Count = list.Count(); ;
+
+            return View(subjects);
+        }
     }
 }
