@@ -7257,6 +7257,9 @@
     <Content Include="Views\Subject\IndexStudent.cshtml" />
     <Content Include="Views\QuizTest\IndexStudent.cshtml" />
     <Content Include="Views\DoQuiz\MyActiveTest.cshtml" />
+    <Content Include="Views\DoQuiz\OpenRoom.cshtml" />
+    <Content Include="Views\Shared\_Room.cshtml" />
+    <Content Include="Views\Authen\ChangePass.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

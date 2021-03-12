@@ -38,7 +38,7 @@ namespace Quiz.Controllers
 
             }).OrderByDescending(x => x.Id).ToPagedList(page, pageSize);
 
-            ViewBag.SearchString = keyword;
+            ViewBag.keyword = keyword;
 
             ViewBag.Count = list.Count(); ;
 

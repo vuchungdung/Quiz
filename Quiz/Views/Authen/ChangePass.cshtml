@@ -1,0 +1,35 @@
+﻿@model Quiz.ViewModel.ChangepassViewModel
+
+@{
+    ViewBag.Title = "ChangePass";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="login-box">    
+    <div class="login-box-body">
+        <h4 class="login-box-msg">Đổi mật khẩu</h4>
+
+        @using (Html.BeginForm("ChangePass", "Authen", FormMethod.Post))
+        {
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" });
+            <div class="form-group has-feedback">
+                @Html.PasswordFor(m => m.oldpassword, new { @class = "form-control", placeholder = "Nhập mật khẩu cũ" })                
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                @Html.PasswordFor(m => m.oldpassword, new { @class = "form-control", placeholder = "Mật khẩu mới" })
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                @Html.PasswordFor(m => m.repassword, new { @class = "form-control", placeholder = "Mật khẩu mới" })
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="row">
+                <div class="col-xs-8">
+                    <a href="/Authen/ChangePass" class="btn btn-primary">Đổi mật khẩu</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

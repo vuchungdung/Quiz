@@ -1,0 +1,330 @@
+﻿@{
+    ViewBag.Title = "OpenRoom";
+    Layout = "~/Views/Shared/_Room.cshtml";
+}
+
+
+<div class="lockscreen-wrapper" id="infoArea">
+    <div class="lockscreen-logo">
+        <h3>Chào mừng thí sinh</h3>
+    </div>
+    <div class="lockscreen-name text-center">
+        <h4>Họ tên: @Session["Name"].ToString()</h4>
+    </div>
+
+    <div class="lockscreen-item">
+
+        <div class="lockscreen-image">
+            <img src="~/Assets/dist/img/user2-160x160.jpg" alt="User Image">
+        </div>
+        <form class="lockscreen-credentials">
+            <div class="input-group">
+                <input type="text" id="roomCode" class="form-control" placeholder="Nhập mã phòng thi">
+
+                <div class="input-group-btn">
+                    <button type="button" onclick="EnterRoom()" class="btn"><i class="fa fa-arrow-right text-muted"></i></button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="help-block text-center">
+        Hãy nhập mã phòng thi mà giáo viên của bạn đã cung cấp.<br /> Đấy là mã duy nhất để truy cập phòng thi
+    </div>
+    <div class="text-center">
+        <a href="/Subject/IndexStudent">Quay lại</a>
+    </div>
+</div>
+
+<div id="QuizInfo" class="hidden">
+    <div class="content container-fluid">
+        <section class="content" style="background-color:white;border-radius:10px">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="body">
+                        <div class="box-body">
+                            <div class="row pl-4">
+                                <div class="col-md-4 mt-5 p-5" id="quiz"></div>
+                                <div class="col-md-4 mt-5" id="centerPanel">
+                                    <div class="card radius transparent position-fixed mr-3">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Thông tin bài thi</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="info" id="quizname"></p>
+                                            <p class="info" id="subject"></p>
+                                            <p class="info" id="mark"></p>
+                                            <p class="info" id="time"></p>
+                                            <a href="#" id="startBtn" onclick="StartExam()" class="btn btn-danger float-right">Bắt đầu !</a>
+                                            <div id="timePanel" class="hidden">
+                                                <hr class="mt-2" />
+                                                <h5 class="card-title">Thời gian còn lại:</h5>
+                                                <div id="timer" style="font-size:35px;"></div>
+                                                <a href="#" id="submitBtn" onclick="SubmitExam()" class="btn btn-warning float-right hidden">NỘP BÀI</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="rightPanel"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    var roomCode = '';
+    var Quiz = {};
+    const quizContainer = document.getElementById('quiz');
+    function JoinRoom() {
+        $('#roomCode').val('');
+        $('#enterModal').modal('show');
+    }
+    function EnterRoom() {
+        let code = $('#roomCode').val();
+        if (code) {
+            OpenRoom(code);
+        }
+        else {
+            swal('Lỗi', 'Vui lòng nhập mã phòng', 'warning');
+        }
+    }
+    function Preview(Quiz) {
+        let quizinfo = $('#QuizInfo');
+        quizinfo.find('#quizname').html('<b>Tên bài thi:</b> ' + Quiz.TestName);
+        quizinfo.find('#mark').html('<b>Môn học:</b> ' + Quiz.SubjectName);
+        quizinfo.find('#subject').html('<b>Tổng điểm:</b> ' + Quiz.TotalMark);
+        quizinfo.find('#time').html('<b>Thời gian (phút):</b> ' + Quiz.TotalTime)
+        quizinfo.removeClass('hidden');
+        roomCode = Quiz.RoomCode;
+    }
+    function OpenRoom(code) {
+        $('#overlay').fadeIn();
+        axios.post('/DoQuiz/EnterRoom', { roomCode: code }).then(resp => {
+
+            $('#overlay').fadeOut();
+            let data = resp.data;
+            Quiz = data.Quiz;
+            if (data.Success) {
+                $("#infoArea").addClass('hidden');
+                Preview(data.Quiz);
+            }
+            else {
+                swal('Lỗi', data.Message, 'warning')
+            }
+        })
+    }
+    function StartExam() {
+        $('#overlay').fadeIn();
+        axios.post('/DoQuiz/StartExam', { roomCode: roomCode }).then(resp => {
+            $('#overlay').fadeOut();
+            let data = resp.data;
+            if (data.Success) {
+                $('#rightPanel').addClass('hidden');
+                $('#quiz').removeClass('col-md-4');
+                $('#quiz').addClass('col-md-8');
+                $('#quiz').addClass('transparent');
+                $('#quiz').addClass('radius');
+                $('#startBtn').addClass('hidden');
+                $('#submitBtn').removeClass('hidden');
+                $('title').html('Đang làm bài thi');
+                $('#timePanel').removeClass('hidden');
+                buildQuiz(Quiz.QuizList);
+                StartTimer(Quiz.TotalTime);
+            }
+            else {
+                swal('Lỗi', data.Message, 'warning')
+            }
+        });
+    }
+    function buildQuiz(Quiz) {
+        const output = [];
+        let tempQuiz = Quiz.sort(function (a, b) {
+            return 0.6 - Math.random();
+        });
+
+        tempQuiz.forEach(
+            (currentQuestion, questionNumber) => {
+                const answers = [];
+                answers.push(
+                    `<div>
+                        <input type="radio" id="question${currentQuestion.ID}1" name="${currentQuestion.ID}" value="0">
+                        <label for="question${currentQuestion.ID}1" >
+                        ${currentQuestion.answerA}
+                        </label>
+                        </div>`
+                );
+                answers.push(
+                    `<div>
+                        <input type="radio" id="question${currentQuestion.ID}2" name="${currentQuestion.ID}" value="1">
+                        <label for="question${currentQuestion.ID}2">
+                        ${currentQuestion.answerB}
+                        </label>
+                        </div>`
+                );
+                answers.push(
+                    `<div>
+                        <input type="radio" id="question${currentQuestion.ID}3" name="${currentQuestion.ID}" value="2">
+                        <label for="question${currentQuestion.ID}3">
+                        ${currentQuestion.answerC}
+                        </label>
+                        </div>`
+                );
+                answers.push(
+                    `<div>
+                        <input type="radio" id="question${currentQuestion.ID}4" name="${currentQuestion.ID}" value="3">
+                        <label for="question${currentQuestion.ID}4">
+                        ${currentQuestion.answerD}
+                        </label>
+                        </div>`
+                );
+
+                output.push(
+                    `<div>
+                            <div class="question q-title"><h4>Câu ${questionNumber + 1}.  ${currentQuestion.Content}</h4></div>
+                            <div class="answers md-radio"><h5>${answers.join('')}</h5></div>
+                         </div>`
+                );
+            }
+        );
+
+        quizContainer.innerHTML = `<form id="quizForm">` + output.join('') + `</form>`;
+    }
+</script>
+<script>
+    function SubmitExam() {
+        let countCheck = checkedAll();
+        if (countCheck != Quiz.QuizList.length) {
+            swal('Lỗi', 'Bạn chưa chọn hết đáp án', 'warning')
+        }
+        else {
+            let answerList = [];
+            $("form#quizForm :input").each(function () {
+                var input = $(this);
+                if (input.is(':checked')) {
+                    let value = input.val();
+                    let QuizID = input.attr("name");
+                    answerList.push({ QuizID: QuizID, Answer: value });
+                }
+            });
+            SendData(answerList);
+        }
+
+    }
+    function SendData(answerList) {
+        $('#overlay').fadeIn();
+        axios.post('/DoQuiz/SubmitExam', { roomCode: roomCode, answerList: answerList }).then(resp => {
+            $('#overlay').fadeOut();
+            swal('Đã nộp bài', 'Bạn đạt ' + Number(resp.data.score).toFixed(2) + '/' + resp.data.maxScore + ' điểm', 'success').then((e) => {
+                location.reload();
+            })
+        });
+    }
+    function checkedAll() {
+        var count = 0;
+        $("form#quizForm :input").each(function () {
+            var input = $(this);
+            if (input.is(':checked')) {
+                count++;
+            }
+        });
+        return count;
+    }
+    function EndTime() {
+        let answerList = [];
+        $("form#quizForm :input").each(function () {
+            var input = $(this);
+            if (input.is(':checked')) {
+                let value = input.val();
+                let QuizID = input.attr("name");
+                answerList.push({ QuizID: QuizID, Answer: value });
+            }
+        });
+        SendData(answerList);
+    }
+</script>
+<script language="JavaScript" type="text/javascript">
+    function CountDownTimer(duration, granularity) {
+        this.duration = duration * 60;
+        this.granularity = granularity || 1000;
+        this.tickFtns = [];
+        this.running = false;
+    }
+
+    CountDownTimer.prototype.start = function () {
+        if (this.running) {
+            return;
+        }
+        this.running = true;
+        var start = Date.now(),
+            that = this,
+            diff, obj;
+
+        (function timer() {
+            diff = that.duration - (((Date.now() - start) / 1000) | 0);
+
+            if (diff > 0) {
+                setTimeout(timer, that.granularity);
+            } else {
+                diff = 0;
+                that.running = false;
+            }
+
+            obj = CountDownTimer.parse(diff);
+            that.tickFtns.forEach(function (ftn) {
+                ftn.call(this, obj.minutes, obj.seconds);
+            }, that);
+        }());
+    };
+
+    CountDownTimer.prototype.onTick = function (ftn) {
+        if (typeof ftn === 'function') {
+            this.tickFtns.push(ftn);
+        }
+        return this;
+    };
+
+    CountDownTimer.prototype.expired = function () {
+        return !this.running;
+    };
+
+    CountDownTimer.parse = function (seconds) {
+        return {
+            'minutes': (seconds / 60) | 0,
+            'seconds': (seconds % 60) | 0
+        };
+    };
+
+    CountDownTimer.parseMinutes = function (minutes) {
+        return {
+            'minutes': (minutes) | 0,
+            'seconds': 0
+        };
+    };
+
+    function StartTimer(min) {
+        var display = document.querySelector('#timer'),
+            timer = new CountDownTimer(min),
+            timeObj = CountDownTimer.parseMinutes(min);
+
+        format(timeObj.minutes, timeObj.seconds);
+        timer.onTick(format);
+        timer.start();
+
+        function format(minutes, seconds) {
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            display.textContent = minutes + ':' + seconds;
+
+            ///console.log(display.textContent);
+
+            if (display.textContent == "00:00") {
+                EndTime();
+            }
+        }
+    }
+</script>
+<script src="~/Scripts/axios.min.js"></script>
