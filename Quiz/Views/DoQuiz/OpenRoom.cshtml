@@ -38,40 +38,40 @@
 
 <div id="QuizInfo" class="hidden">
     <div class="content container-fluid">
-        <section class="content" style="background-color:white;border-radius:10px">
-            <div class="row">
-                <div class="col-xs-12">
-                    <div class="body">
-                        <div class="box-body">
-                            <div class="row pl-4">
-                                <div class="col-md-4 mt-5 p-5" id="quiz"></div>
-                                <div class="col-md-4 mt-5" id="centerPanel">
-                                    <div class="card radius transparent position-fixed mr-3">
-                                        <div class="card-header">
-                                            <h3 class="card-title">Thông tin bài thi</h3>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="info" id="quizname"></p>
-                                            <p class="info" id="subject"></p>
-                                            <p class="info" id="mark"></p>
-                                            <p class="info" id="time"></p>
-                                            <a href="#" id="startBtn" onclick="StartExam()" class="btn btn-danger float-right">Bắt đầu !</a>
-                                            <div id="timePanel" class="hidden">
-                                                <hr class="mt-2" />
-                                                <h5 class="card-title">Thời gian còn lại:</h5>
-                                                <div id="timer" style="font-size:35px;"></div>
-                                                <a href="#" id="submitBtn" onclick="SubmitExam()" class="btn btn-warning float-right hidden">NỘP BÀI</a>
-                                            </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="body">
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-4 mt-5 p-5" id="quiz">
+
+                            </div>
+                            <div class="col-md-4 mt-5" id="centerPanel">
+                                <div class="card radius transparent position-fixed" style="background-color:white;padding:5px 15px 15px 15px;border-radius:5px">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Thông tin bài thi</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="info" id="quizname"></p>
+                                        <p class="info" id="subject"></p>
+                                        <p class="info" id="mark"></p>
+                                        <p class="info" id="time"></p>
+                                        <a href="#" id="startBtn" onclick="StartExam()" class="btn btn-danger float-right">Bắt đầu !</a>
+                                        <div id="timePanel" class="hidden">
+                                            <hr class="mt-2" />
+                                            <h5 class="card-title">Thời gian còn lại:</h5>
+                                            <div id="timer" style="font-size:35px;"></div>
+                                            <a href="#" id="submitBtn" onclick="SubmitExam()" class="btn btn-warning float-right hidden">NỘP BÀI</a>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4" id="rightPanel"></div>
                             </div>
+                            <div class="col-md-4" id="rightPanel"></div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
 </div>
 
@@ -128,6 +128,7 @@
                 $('#quiz').addClass('col-md-8');
                 $('#quiz').addClass('transparent');
                 $('#quiz').addClass('radius');
+                $('#quiz').css({ "background-color": "white", "border-radius": "5px" });
                 $('#startBtn').addClass('hidden');
                 $('#submitBtn').removeClass('hidden');
                 $('title').html('Đang làm bài thi');
