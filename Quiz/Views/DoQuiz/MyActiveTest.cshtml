@@ -25,7 +25,6 @@
                 <div class="box-header">
                     <h3 class="box-title">Bảng danh sách phòng thi</h3>
                 </div>
-                <a href="/Quiz/Create" style="margin-left:10px" class="btn btn-sm btn-success">Thêm mới</a>
                 <div class="box-body">
                     <h5 class="text-danger">Có tổng số: @ViewBag.Count phòng thi khác nhau.</h5>
                     <table id="example1" class="table table-bordered table-striped">
@@ -56,7 +55,7 @@
                                             @item.Code
                                         </td>
                                         <td>
-                                            @Html.ActionLink("Xem kết quả", "TestResult", "Admin", new { roomID = item.ID }, new { @class = "badge badge-primary" })
+                                            @Html.ActionLink("Xem kết quả", "TestResult", "Home", new { roomID = item.ID }, new { @class = "badge badge-primary" })
                                         </td>
                                     </tr>
                                 } 

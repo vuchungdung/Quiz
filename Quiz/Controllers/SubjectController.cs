@@ -16,14 +16,14 @@ namespace Quiz.Controllers
         QuizContext _db = new QuizContext();
 
         [Authorize(Roles = "admin,teacher")]
-        public ActionResult Index(string keyword, int page = 1, int pageSize = 7)
+        public ActionResult Index(string keyWord, int page = 1, int pageSize = 7)
         {
             IPagedList<SubjectViewModel> subjects = null;
             var list = _db.Subjects.ToList();
 
-            if (!String.IsNullOrEmpty(keyword))
+            if (!String.IsNullOrEmpty(keyWord))
             {
-                list = list.Where(x => x.name.ToUpper().Contains(keyword.ToUpper())).ToList();
+                list = list.Where(x => x.name.ToUpper().Contains(keyWord.ToUpper())).ToList();
             }
 
             subjects = list.Select(x => new SubjectViewModel()
@@ -31,7 +31,7 @@ namespace Quiz.Controllers
                 Id = x.ID,
                 Name = x.name
             }).OrderByDescending(x => x.Id).ToPagedList(page, pageSize);
-            ViewBag.SearchString = keyword;
+            ViewBag.keyWord = keyWord;
 
             ViewBag.Count = list.Count(); ;
 

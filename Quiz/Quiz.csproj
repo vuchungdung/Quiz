@@ -171,6 +171,7 @@
     <Compile Include="ViewModel\ChangepassViewModel.cs" />
     <Compile Include="ViewModel\DoTestViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="ViewModel\QuizResultViewModel.cs" />
     <Compile Include="ViewModel\QuizSearchViewModel.cs" />
     <Compile Include="ViewModel\QuizTestViewModel.cs" />
     <Compile Include="ViewModel\QuizViewModel.cs" />
@@ -7260,6 +7261,8 @@
     <Content Include="Views\DoQuiz\OpenRoom.cshtml" />
     <Content Include="Views\Shared\_Room.cshtml" />
     <Content Include="Views\Authen\ChangePass.cshtml" />
+    <Content Include="Views\Home\Dashboard.cshtml" />
+    <Content Include="Views\Home\TestResult.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

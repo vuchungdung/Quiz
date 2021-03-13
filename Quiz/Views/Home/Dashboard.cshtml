@@ -1,0 +1,71 @@
+﻿
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-aqua"><i class="ion ion-ios-gear-outline"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Đề thi</span>
+                    <span class="info-box-number">@ViewBag.countTest</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-google-plus"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Câu hỏi</span>
+                    <span class="info-box-number">@ViewBag.countQuiz</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">Phòng thi</span>
+                    <span class="info-box-number">@ViewBag.countRoom</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        @{
+            if (User.IsInRole("admin"))
+            {
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Đang truy cập</span>
+                            @{
+                                HttpApplicationState thongke = HttpContext.Current.ApplicationInstance.Application;
+                            }
+                            <span class="info-box-number">@thongke["visitors_online"]</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+            }
+        }
+
+        <!-- /.col -->
+    </div>
+</section>

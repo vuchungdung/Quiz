@@ -18,6 +18,7 @@ namespace Quiz
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            Application["visitors_online"] = 0;
         }
         protected void Application_AuthenticateRequest(Object sender, EventArgs e)
         {
@@ -38,6 +39,19 @@ namespace Quiz
 
             if (Context.User != null)
                 Context.User = new GenericPrincipal(Context.User.Identity, roles);
+        }
+
+        protected void Session_Start(Object sender, EventArgs e)
+        {
+            Application.Lock();
+            Application["visitors_online"] = Convert.ToInt32(Application["visitors_online"]) + 1;
+            Application.UnLock();
+        }
+        protected void Session_End(Object sender, EventArgs e)
+        {
+            Application.Lock();
+            Application["visitors_online"] = Convert.ToInt32(Application["visitors_online"]) - 1;
+            Application.UnLock();
         }
     }
 }

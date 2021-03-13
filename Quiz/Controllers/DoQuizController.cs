@@ -18,6 +18,7 @@ namespace Quiz.Controllers
             return View();
         }
 
+        //Danh sách đề thi của người tạo
         [Authorize(Roles = "teacher,admin")]
         public ViewResult MyActiveTest(int page = 1, int pageSize = 7)
         {
@@ -28,7 +29,7 @@ namespace Quiz.Controllers
             ViewBag.Count = list.Count();
             return View(activeTests);
         }
-
+        // Tạo phòng thi
         public JsonResult CreateActiveTest(int QuizTestID, string Code, DateTime FromTime, DateTime ToTime)
         {
             bool ExistCode = db.ActiveTests.Any(a => a.Code == Code);
@@ -50,6 +51,7 @@ namespace Quiz.Controllers
             return Json(new { Message = "Tạo thành công", Success = true }, JsonRequestBehavior.AllowGet);
         }
 
+        //Lấy ra đề thi sau khi đã vào room
         [Authorize(Roles = "student")]
         public JsonResult EnterRoom(string roomCode)
         {
@@ -89,12 +91,13 @@ namespace Quiz.Controllers
             }
             return Json(new { Message = "Sai mã phòng thi", Success = false }, JsonRequestBehavior.AllowGet);
         }
+        //Vào phòng thi
         [Authorize(Roles = "student")]
         public ViewResult OpenRoom()
         {
             return View();
         }
-
+        // bắt đầu thi
         public JsonResult StartExam(string roomCode)
         {
             ActiveTest test = db.ActiveTests.Where(c => c.Code == roomCode).First();
@@ -114,7 +117,7 @@ namespace Quiz.Controllers
             }
             return Json(new { Message = "Sai mã phòng thi hoặc hết hạn", Success = false }, JsonRequestBehavior.AllowGet);
         }
-
+        //Lưu lại kết quả sau khi thi xong
         [Authorize(Roles = "student")]
         public JsonResult SubmitExam(string roomCode, List<SubmitExamViewModel> answerList)
         {

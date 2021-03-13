@@ -53,8 +53,6 @@ namespace Quiz.Models
         Doing = 0,
         [Display(Name = "Đã hoàn thành")]
         Finished = 1,
-        [Display(Name = "Chưa nộp bài")]
-        NotFinished = 2,
     }
     public enum Gender
     {

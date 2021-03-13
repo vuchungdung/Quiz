@@ -102,10 +102,9 @@
         roomCode = Quiz.RoomCode;
     }
     function OpenRoom(code) {
-        $('#overlay').fadeIn();
+        
         axios.post('/DoQuiz/EnterRoom', { roomCode: code }).then(resp => {
 
-            $('#overlay').fadeOut();
             let data = resp.data;
             Quiz = data.Quiz;
             if (data.Success) {
@@ -118,9 +117,7 @@
         })
     }
     function StartExam() {
-        $('#overlay').fadeIn();
         axios.post('/DoQuiz/StartExam', { roomCode: roomCode }).then(resp => {
-            $('#overlay').fadeOut();
             let data = resp.data;
             if (data.Success) {
                 $('#rightPanel').addClass('hidden');
@@ -216,9 +213,7 @@
 
     }
     function SendData(answerList) {
-        $('#overlay').fadeIn();
         axios.post('/DoQuiz/SubmitExam', { roomCode: roomCode, answerList: answerList }).then(resp => {
-            $('#overlay').fadeOut();
             swal('Đã nộp bài', 'Bạn đạt ' + Number(resp.data.score).toFixed(2) + '/' + resp.data.maxScore + ' điểm', 'success').then((e) => {
                 location.reload();
             })

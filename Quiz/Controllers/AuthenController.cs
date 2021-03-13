@@ -114,7 +114,7 @@ namespace Quiz.Controllers
                     gender = model.gender,
                     register_date = DateTime.Now,
                     role = model.type == RegisterType.Student ? "student" : "teacher",
-                    status = UserStatus.NotActivated,
+                    status = UserStatus.Activated,
                     fullname = model.fullname,
                     type = (UserType)model.type,
                 };

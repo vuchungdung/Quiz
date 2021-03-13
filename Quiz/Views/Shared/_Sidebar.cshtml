@@ -20,6 +20,10 @@
             </div>
         </form>
         <ul class="sidebar-menu" data-widget="tree">
+            @if (User.IsInRole("admin") || User.IsInRole("teacher"))
+            {
+                <li><a href="/Home/Index"><i class="fa fa-edit"></i> Trang chủ</a></li>
+            }
             <li class="header">Điều Hành</li>
             @if (User.IsInRole("admin") || User.IsInRole("teacher"))
             {

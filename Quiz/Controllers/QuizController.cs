@@ -17,14 +17,14 @@ namespace Quiz.Controllers
         QuizContext _db = new QuizContext();
 
         [Authorize(Roles = "admin")]
-        public ActionResult Index(string keyword, int page = 1, int pageSize = 7)
+        public ActionResult Index(string keyWord, int page = 1, int pageSize = 7)
         {
             IPagedList<QuizViewModel> quizs = null;
             var list = _db.Quizzes.ToList();
 
-            if (!String.IsNullOrEmpty(keyword))
+            if (!String.IsNullOrEmpty(keyWord))
             {
-                list = list.Where(x => x.name.ToUpper().Contains(keyword.ToUpper())).ToList();
+                list = list.Where(x => x.name.ToUpper().Contains(keyWord.ToUpper())).ToList();
             }
 
             quizs = list.Select(x => new QuizViewModel()
@@ -38,7 +38,7 @@ namespace Quiz.Controllers
 
             }).OrderByDescending(x => x.Id).ToPagedList(page, pageSize);
 
-            ViewBag.SearchString = keyword;
+            ViewBag.SearchString = keyWord;
 
             ViewBag.Count = list.Count(); ;
 
@@ -162,16 +162,16 @@ namespace Quiz.Controllers
             }
         }
         [Authorize(Roles = "admin,teacher")]
-        public ActionResult MyIndex(string keyword, int page = 1, int pageSize = 7)
+        public ActionResult MyIndex(string keyWord, int page = 1, int pageSize = 7)
         {
             var userID = _db.Users.Where(t => t.username == User.Identity.Name).First().ID;
             IPagedList<QuizViewModel> quizs = null;
 
             var list = _db.Quizzes.Where(x=>x.CreatorID == userID).ToList();
 
-            if (!String.IsNullOrEmpty(keyword))
+            if (!String.IsNullOrEmpty(keyWord))
             {
-                list = list.Where(x => x.name.ToUpper().Contains(keyword.ToUpper())).ToList();
+                list = list.Where(x => x.name.ToUpper().Contains(keyWord.ToUpper())).ToList();
             }
 
             quizs = list.Select(x => new QuizViewModel()
@@ -185,7 +185,7 @@ namespace Quiz.Controllers
 
             }).OrderByDescending(x => x.Id).ToPagedList(page, pageSize);
 
-            ViewBag.SearchString = keyword;
+            ViewBag.keyWord = keyWord;
 
             ViewBag.Count = list.Count(); ;
 
