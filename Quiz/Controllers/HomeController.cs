@@ -1,11 +1,17 @@
-﻿using PagedList;
+﻿using OfficeOpenXml;
+using OfficeOpenXml.Table;
+using PagedList;
 using Quiz.Models;
 using Quiz.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 
 namespace Quiz.Controllers
 {
@@ -51,6 +57,7 @@ namespace Quiz.Controllers
                 listResult = list.OrderByDescending(x => x.Score).ToPagedList(page, pageSize);
                 ViewBag.TestName = db.ActiveTests.Where(c => c.ID == roomID).First().QuizTest.name;
                 ViewBag.Count = list.Count();
+                ViewBag.roomId = roomID;
                 return View(listResult);
             }
             catch
@@ -58,6 +65,59 @@ namespace Quiz.Controllers
                 return RedirectToAction("Index");
             }
 
+        }
+        public ActionResult Export(int? roomID)
+        {
+            DataTable Dt = new DataTable();
+            Dt.Columns.Add("Họ và tên", typeof(string));
+            Dt.Columns.Add("Đề thi", typeof(string)); 
+            Dt.Columns.Add("Ngày thi", typeof(string));
+            Dt.Columns.Add("Điểm", typeof(string));
+            Dt.Columns.Add("Trạng thái", typeof(string));
+            var list = db.QuizResults
+                       .Where(c => c.ActiveTestID == roomID)
+                       .Select(c => new QuizResultViewModel
+                       {
+                           StudentName = c.Student.fullname,
+                           Name = c.ActiveTest.QuizTest.name,
+                           Date = c.DoneAt.ToString("dd/MM/yyyy"),
+                           Point = c.Score.ToString() + "/" + c.ActiveTest.QuizTest.TotalMark.ToString(),
+                           StatusName = c.Status.GetDisplayName(),
+                       }).ToList();
+            foreach (var item in list)
+            {
+                DataRow row = Dt.NewRow();
+                row[0] = item.StudentName;
+                row[1] = item.Name;
+                row[2] = item.Date;
+                row[3] = item.Point;
+                row[4] = item.Status;
+                Dt.Rows.Add(row);
+
+            }
+            var memoryStream = new MemoryStream();
+
+            ExcelPackage.LicenseContext = LicenseContext.Commercial;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            using (var excelPackage = new ExcelPackage(memoryStream))
+            {
+                var worksheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
+                worksheet.Cells["A1"].LoadFromDataTable(Dt, true, TableStyles.None);
+                worksheet.Cells["A1:AN1"].Style.Font.Bold = true;
+                worksheet.DefaultRowHeight = 18;
+
+
+                worksheet.Column(2).Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                worksheet.Column(6).Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Column(7).Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.DefaultColWidth = 20;
+                worksheet.Column(2).AutoFit();
+
+                Session["DownloadExcel_FileManager"] = excelPackage.GetAsByteArray();
+            }
+            byte[] data = Session["DownloadExcel_FileManager"] as byte[];
+            return File(data, "application/octet-stream", "DiemThi.xlsx");
         }
     }
 }
