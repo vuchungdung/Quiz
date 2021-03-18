@@ -74,22 +74,23 @@ namespace Quiz.Controllers
             Dt.Columns.Add("Ngày thi", typeof(string));
             Dt.Columns.Add("Điểm", typeof(string));
             Dt.Columns.Add("Trạng thái", typeof(string));
+
             var list = db.QuizResults
                        .Where(c => c.ActiveTestID == roomID)
                        .Select(c => new QuizResultViewModel
                        {
                            StudentName = c.Student.fullname,
                            Name = c.ActiveTest.QuizTest.name,
-                           Date = c.DoneAt.ToString("dd/MM/yyyy"),
+                           SubmitDate = c.DoneAt,
                            Point = c.Score.ToString() + "/" + c.ActiveTest.QuizTest.TotalMark.ToString(),
-                           StatusName = c.Status.GetDisplayName(),
+                           Status = c.Status,
                        }).ToList();
             foreach (var item in list)
             {
                 DataRow row = Dt.NewRow();
                 row[0] = item.StudentName;
                 row[1] = item.Name;
-                row[2] = item.Date;
+                row[2] = item.SubmitDate;
                 row[3] = item.Point;
                 row[4] = item.Status;
                 Dt.Rows.Add(row);

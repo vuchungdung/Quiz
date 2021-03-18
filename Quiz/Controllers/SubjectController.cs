@@ -109,9 +109,9 @@ namespace Quiz.Controllers
                 _db.SaveChanges();
                 return Json(model.name, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                return null;
             }
         }
         [Authorize(Roles ="student")]

@@ -154,6 +154,7 @@ namespace Quiz.Controllers
         }
         public JsonResult SearchQuiz(int subject, string name = null, HardType? hard = null)
         {
+            User u = _db.Users.Where(i => i.username == User.Identity.Name).First();
             try
             {
                 List<QuizSearchViewModel> lst = null;
@@ -161,7 +162,7 @@ namespace Quiz.Controllers
                 {
                     if (hard.HasValue)
                     {
-                        lst = _db.Quizzes.Where(i => i.SubjectID == subject && i.HardType == hard).Take(30).Select(a => new QuizSearchViewModel
+                        lst = _db.Quizzes.Where(i => i.SubjectID == subject && i.HardType == hard && i.CreatorID == u.ID).Take(30).Select(a => new QuizSearchViewModel
                         {
                             HardType = a.HardType,
                             id = a.QuizID,
@@ -170,7 +171,7 @@ namespace Quiz.Controllers
                     }
                     else
                     {
-                        lst = _db.Quizzes.Where(i => i.SubjectID == subject).Take(30).Select(a => new QuizSearchViewModel
+                        lst = _db.Quizzes.Where(i => i.SubjectID == subject && i.CreatorID == u.ID).Take(30).Select(a => new QuizSearchViewModel
                         {
                             HardType = a.HardType,
                             id = a.QuizID,
@@ -182,7 +183,7 @@ namespace Quiz.Controllers
                 {
                     if (hard.HasValue)
                     {
-                        lst = _db.Quizzes.Where(i => i.SubjectID == subject && i.HardType == hard && i.name.Contains(name)).Take(30).Select(a => new QuizSearchViewModel
+                        lst = _db.Quizzes.Where(i => i.SubjectID == subject && i.HardType == hard && i.name.Contains(name) && i.CreatorID == u.ID).Take(30).Select(a => new QuizSearchViewModel
                         {
                             HardType = a.HardType,
                             id = a.QuizID,
@@ -191,7 +192,7 @@ namespace Quiz.Controllers
                     }
                     else
                     {
-                        lst = _db.Quizzes.Where(i => i.SubjectID == subject && i.name.Contains(name)).Take(30).Select(a => new QuizSearchViewModel
+                        lst = _db.Quizzes.Where(i => i.SubjectID == subject && i.name.Contains(name) && i.CreatorID == u.ID).Take(30).Select(a => new QuizSearchViewModel
                         {
                             HardType = a.HardType,
                             id = a.QuizID,
@@ -211,7 +212,8 @@ namespace Quiz.Controllers
         public JsonResult GetQuizFromTest(int testid)
         {
             QuizTest test = _db.QuizTests.Find(testid);
-            List<QuizViewModel> quizzes = test.Quiz.Select(
+            User u = _db.Users.Where(i => i.username == User.Identity.Name).First();
+            List<QuizViewModel> quizzes = test.Quiz.Where(x => x.CreatorID == u.ID).Select(
                 c => new QuizViewModel
                 {
                     Id = c.QuizID,
@@ -269,9 +271,9 @@ namespace Quiz.Controllers
                 _db.SaveChanges();
                 return Json(model.name, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
-                throw ex;
+                return null;
             }
         }
         [Authorize(Roles = "student")]
