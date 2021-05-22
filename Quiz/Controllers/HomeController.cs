@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using Dapper;
+using OfficeOpenXml;
 using OfficeOpenXml.Table;
 using PagedList;
 using Quiz.Models;
@@ -6,6 +7,7 @@ using Quiz.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -22,13 +24,25 @@ namespace Quiz.Controllers
         {
             if (Request.IsAuthenticated)
             {
+                
                 int UserID = (int)Session["UserID"];
+                var listActiveTest = from a in db.ActiveTests
+                                     join q in db.QuizTests
+                                     on a.QuizTestID equals q.TestID
+                                     join s in db.Subjects
+                                     on q.SubjectID equals s.ID
+                                     select new DropdownViewModel()
+                                     {
+                                         SubjectName = s.name,
+                                         NameQuizTest = q.name,
+                                         Code = a.Code
+                                     };
                 if (User.IsInRole("teacher")||User.IsInRole("admin"))
                 {
                     ViewBag.countQuiz = db.Quizzes.Count(c => c.CreatorID == UserID);
                     ViewBag.countTest = db.QuizTests.Count(c => c.CreatorID == UserID);
                     ViewBag.countRoom = db.ActiveTests.Count(c => c.CreatorID == UserID);
-                    return View("Dashboard");
+                    return View("Dashboard", listActiveTest.ToList());
                 }
                 return View();
             }
@@ -119,6 +133,35 @@ namespace Quiz.Controllers
             }
             byte[] data = Session["DownloadExcel_FileManager"] as byte[];
             return File(data, "application/octet-stream", "DiemThi.xlsx");
+        }
+        public JsonResult Statistical(string code)
+        {
+            var sql = @"select qr.Score, count(qr.Score) as Amount, q.TotalMark, q.name
+                        from dbo.ActiveTests as a, dbo.QuizResults as qr, dbo.QuizTests as q 
+                        where qr.ActiveTestID = a.ID and q.TestID = a.QuizTestID and a.Code = '" + code+"'"+
+                        "group by qr.Score, q.TotalMark, q.name";
+            using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-G6EPV8T\SQLEXPRESS;Initial Catalog=Test;Integrated Security=True;"))
+            {
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
+                }
+                var result = conn.Query<ChartViewModel>(sql, null, null, true, 120, CommandType.Text);
+
+                ResponseChartViewModel listResult = new ResponseChartViewModel();
+
+                foreach(var item in result)
+                {
+                    listResult.name = item.name;
+                    listResult.totalMark = item.TotalMark;
+                    ChartView elm = new ChartView();
+                    elm.Amount = item.Amount;
+                    elm.Score = item.Score;
+                    listResult.Charts.Add(elm);
+                }
+
+                return Json(listResult, JsonRequestBehavior.AllowGet);
+            }
         }
     }
 }

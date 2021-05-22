@@ -34,7 +34,7 @@ namespace Quiz.Common
                 new SelectListItem
                     {
                         Text = m.name,
-                        Value = m.ID.ToString(),
+                        Value = m.ID.ToString()
                     }
                 ).ToList();
             return lstSub;
